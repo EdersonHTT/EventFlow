@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Event } from "./Event";
 
 @Entity("tickets")
 export class Ticket {
@@ -6,12 +7,21 @@ export class Ticket {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "datetime" })
-    criacao: Date;
+    @Column()
+    buyerName: string;
 
-    @Column({ type: "datetime" })
-    dataFinal: Date;
+    @Column()
+    buyerEmail: string;
 
-    @Column({ default: false })
-    ValidadeVencida: boolean;
+    @Column("decimal")
+    price: number;
+
+    @Column()
+    qrCode: string;
+
+    @Column({ default: "pending" })
+    status: string;
+
+    @ManyToOne(() => Event, event => event.tickets)
+    event: Event;
 }
