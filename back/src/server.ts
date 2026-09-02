@@ -1,6 +1,6 @@
+import { AppDataSource } from './config/DataSource';
 import express from "express";
 import cors from "cors";
-import { AppDataSource } from "./config/DataSource";
 import router from "./routes";
 
 const app = express();
