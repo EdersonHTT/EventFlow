@@ -14,7 +14,7 @@ AppDataSource.initialize().then(() => {
     app.use("/api", router);
     
     app.listen(process.env.PORT, () => {
-        console.log(`Servidor rodando na porta ${process.env.PORT}`);
+        console.log(`Servidor rodando em http://localhost:${process.env.PORT}`);
     });
 }).catch((error) => {
     console.error("Erro ao conectar ao banco de dados:", error);
