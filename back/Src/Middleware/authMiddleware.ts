@@ -39,7 +39,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     }
 
 
-    ;(req as any).user = decoded
+    (req as any).user = decoded
 
 
     next()

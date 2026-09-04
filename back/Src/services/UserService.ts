@@ -1,8 +1,8 @@
 import { Role } from "../models/role/Role";
-import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/bcrypt";
 import { generateToken } from "../utils/jwt";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../errors";
 
 function removePassword(user: any) {
     const { password, ...userSafe } = user;
@@ -22,7 +22,7 @@ export class UserService {
         const user = await this.userRepo.findById(id);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         return removePassword(user);
@@ -32,7 +32,7 @@ export class UserService {
         const user = await this.userRepo.findByEmail(email);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         return removePassword(user);
@@ -42,7 +42,7 @@ export class UserService {
         const user = await this.userRepo.findByCpf(cpf);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         return removePassword(user);
@@ -53,11 +53,11 @@ export class UserService {
         const user = await this.userRepo.findByEmail(email);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         if (user.password !== password) {
-            throw new Error("Invalid password");
+            throw new UnauthorizedError("Senha inválida");
         }
 
         const token = generateToken({ id: user.id, email: user.email });
@@ -74,7 +74,7 @@ export class UserService {
         const validate = await this.userRepo.findByEmail(email);
 
         if(validate) {
-            throw new Error("Email já cadastrado");
+            throw new ConflictError("Email já cadastrado");
         }
 
         const hashedPassword = await hashPassword(password);
@@ -94,19 +94,19 @@ export class UserService {
         const user = await this.userRepo.findById(id);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         const emailAlreadyExists = await this.userRepo.findByEmail(email);
 
         if (emailAlreadyExists && emailAlreadyExists.id !== id) {
-            throw new Error("Email já cadastrado");
+            throw new ConflictError("Email já cadastrado");
         }
 
         const cpfAlreadyExists = await this.userRepo.findByCpf(cpf);
 
         if (cpfAlreadyExists && cpfAlreadyExists.id !== id) {
-            throw new Error("CPF já cadastrado");
+            throw new ConflictError("CPF já cadastrado");
         }
 
         const updatedUser = await this.userRepo.update(id, {
@@ -122,7 +122,7 @@ export class UserService {
         const user = await this.userRepo.findById(id);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         await this.userRepo.delete(id);

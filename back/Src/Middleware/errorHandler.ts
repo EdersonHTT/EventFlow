@@ -1,10 +1,17 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../errors";
 
-export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
-  console.error(err);
-  res.status(500).json({ message: "Erro interno do servidor" });
-}
+export function errorHandler(err: Error | AppError, req: Request, res: Response, next: NextFunction) {
+   
+    console.error(err.message);
 
-export function notFound(req: Request, res: Response) {
-  res.status(404).json({ message: `Rota ${req.method} ${req.originalUrl} não existe` });
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({
+            message: err.message
+        });
+    }
+
+    return res.status(500).json({
+        message: "Erro interno do servidor"
+    });
 }
