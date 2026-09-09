@@ -1,7 +1,7 @@
 import { hashPassword } from "./bcrypt"
 
-function hashPass() {
-    const hash = hashPassword("123Adwd@");
+async function hashPass() {
+    const hash = await hashPassword("123Admin@");
     console.log(hash);
 }
 

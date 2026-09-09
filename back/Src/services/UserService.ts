@@ -1,6 +1,6 @@
 import { Role } from "../models/role/Role";
 import { UserRepo } from "../repositories/UserRepo";
-import { hashPassword } from "../utils/bcrypt";
+import { comparePassword, hashPassword } from "../utils/bcrypt";
 import { generateToken } from "../utils/jwt";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../errors";
 
@@ -56,11 +56,13 @@ export class UserService {
             throw new NotFoundError("Usuário não encontrado");
         }
 
-        if (user.password !== password) {
+        const isPasswordValid = await comparePassword(password, user.password);
+
+        if (!isPasswordValid) {
             throw new UnauthorizedError("Senha inválida");
         }
 
-        const token = generateToken({ id: user.id, email: user.email });
+        const token = generateToken({ id: user.id, email: user.email, roles: user.roles });
 
         return {
             user: removePassword(user),
