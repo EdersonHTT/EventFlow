@@ -6,6 +6,7 @@ dotenv.config();
 interface Payload {
     id: number;
     email: string;
+    roles: number;
 }
 
 export const generateToken = (payload: Payload) => {
