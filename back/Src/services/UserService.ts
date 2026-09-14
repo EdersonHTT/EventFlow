@@ -13,41 +13,6 @@ function removePassword(user: any) {
 export class UserService {
     private userRepo = new UserRepo();
 
-    async listUsers() {
-        const users = await this.userRepo.findAll();
-        return users.map(user => removePassword(user));
-    }
-
-    async listUserById(id: number) {
-        const user = await this.userRepo.findById(id);
-
-        if (!user) {
-            throw new NotFoundError("Usuário não encontrado");
-        }
-
-        return removePassword(user);
-    }
-
-    async listUserByEmail(email: string) {
-        const user = await this.userRepo.findByEmail(email);
-
-        if (!user) {
-            throw new NotFoundError("Usuário não encontrado");
-        }
-
-        return removePassword(user);
-    }
-
-    async listUserByCpf(cpf: string) {
-        const user = await this.userRepo.findByCpf(cpf);
-
-        if (!user) {
-            throw new NotFoundError("Usuário não encontrado");
-        }
-
-        return removePassword(user);
-    }
-
     async login(email: string, password: string) {
 
         const user = await this.userRepo.findByEmail(email);
@@ -130,6 +95,41 @@ export class UserService {
         await this.userRepo.delete(id);
 
         return { message: "User deleted successfully" };
+    }
+
+    async listUsers() {
+        const users = await this.userRepo.findAll();
+        return users.map(user => removePassword(user));
+    }
+
+    async listUserById(id: number) {
+        const user = await this.userRepo.findById(id);
+
+        if (!user) {
+            throw new NotFoundError("Usuário não encontrado");
+        }
+
+        return removePassword(user);
+    }
+
+    async listUserByEmail(email: string) {
+        const user = await this.userRepo.findByEmail(email);
+
+        if (!user) {
+            throw new NotFoundError("Usuário não encontrado");
+        }
+
+        return removePassword(user);
+    }
+
+    async listUserByCpf(cpf: string) {
+        const user = await this.userRepo.findByCpf(cpf);
+
+        if (!user) {
+            throw new NotFoundError("Usuário não encontrado");
+        }
+
+        return removePassword(user);
     }
 
 }
