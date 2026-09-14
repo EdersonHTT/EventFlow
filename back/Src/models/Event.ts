@@ -6,7 +6,6 @@ import {
     OneToMany
 } from "typeorm";
 
-import { Category } from "./Category";
 import { Location } from "./Location";
 import { Registration } from "./Registration";
 import { Ticket } from "./Ticket";
@@ -28,9 +27,6 @@ export class Event {
 
     @Column({ type: "time" })
     time: string;
-
-    @ManyToOne(() => Category, category => category.events)
-    category: Category;
 
     @ManyToOne(() => Location, location => location.events)
     location: Location;
