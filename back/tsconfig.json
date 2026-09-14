@@ -9,8 +9,7 @@
     "strictPropertyInitialization": false,
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
