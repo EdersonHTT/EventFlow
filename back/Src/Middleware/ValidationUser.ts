@@ -1,19 +1,23 @@
-import { NextFunction, Request, Response } from "express"
+import { NextFunction, Request, Response } from "express";
+import { ZodType } from "zod";
+import { userCreateSchema } from "../validators/UserValidator";
 
-export function validateUser(req: Request, res: Response, next: NextFunction) {
-    const { name, email, password } = req.body
+export function validateUser(schema: ZodType = userCreateSchema) {
+    return validateRequest(schema);
+}
 
-    if (!name || !email || !password) {
-        return res.status(400).json({
-            message: "Nome, email e senha são obrigatórios."
-        })
-    }
+export function validateRequest(schema: ZodType) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const result = schema.safeParse(req.body);
 
-    if (password.length < 6) {
-        return res.status(400).json({
-            message: "A senha precisa ter pelo menos 6 caracteres."
-        })
-    }
+        if (!result.success) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors: result.error.issues
+            });
+        }
 
-    next()
+        req.body = result.data;
+        next();
+    };
 }
