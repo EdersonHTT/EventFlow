@@ -6,35 +6,27 @@ export class EventRepo {
 
     async findAll() {
         return await this.eventRepository.find({
-            relations: { category: true, location: true, registrations: true, tickets: true }
+            relations: { location: true, registrations: true, tickets: true }
         });
     }
 
     async findById(id: number) {
         return await this.eventRepository.findOne({
             where: { id },
-            relations: { category: true, location: true, registrations: true, tickets: true }
+            relations: { location: true, registrations: true, tickets: true }
         });
     }
 
     async findByName(name: string) {
         return await this.eventRepository.findOne({
             where: { name },
-            relations: { category: true, location: true, registrations: true, tickets: true }
-        });
-    }
-
-    async findByCategory(categoryId: number) {
-        return await this.eventRepository.find({
-            where: { category: { id: categoryId } },
-            relations: { category: true, location: true, registrations: true, tickets: true }
         });
     }
 
     async findByLocation(locationId: number) {
         return await this.eventRepository.find({
             where: { location: { id: locationId } },
-            relations: { category: true, location: true, registrations: true, tickets: true }
+            relations: { location: true, registrations: true, tickets: true }
         });
     }
 
