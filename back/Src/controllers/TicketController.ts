@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { TicketService } from "../services/TicketService";
+import { TicketStatus } from "../models/Ticket";
 
 export class TicketController {
     private ticketService = new TicketService();
@@ -35,6 +36,11 @@ export class TicketController {
         return res.status(200).json(updatedTicket);
     }
 
+    async check(req: Request, res: Response) {
+        const ticket = await this.ticketService.check(Number(req.params.id));
+        return res.status(200).json(ticket);
+    }
+
     async delete(req: Request, res: Response) {
         const { id } = req.params;
 
@@ -44,7 +50,9 @@ export class TicketController {
     }
 
     async listAll(req: Request, res: Response) {
-        const tickets = await this.ticketService.listAll();
+        const authenticatedUser = (req as any).user;
+        const userId = authenticatedUser?.roles === 2 ? authenticatedUser.id : undefined;
+        const tickets = await this.ticketService.listAll(userId);
         return res.status(200).json(tickets);
     }
 
@@ -62,7 +70,7 @@ export class TicketController {
 
     async listByStatus(req: Request, res: Response) {
         const { status } = req.params;
-        const tickets = await this.ticketService.listByStatus(status as string);
+        const tickets = await this.ticketService.listByStatus(status as TicketStatus);
         return res.status(200).json(tickets);
     }
 }

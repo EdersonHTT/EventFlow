@@ -4,8 +4,8 @@ import { EventRepo } from "../repositories/EventRepo";
 export class EventService {
     private eventRepo = new EventRepo();
 
-    async listEvents() {
-        return await this.eventRepo.findAll();
+    async listEvents(userId?: number) {
+        return userId ? await this.eventRepo.findByUser(userId) : await this.eventRepo.findAll();
     }
 
     async listEventById(id: number) {
@@ -27,16 +27,12 @@ export class EventService {
 
         return event;
     }
-
-    async listEventsByCategory(categoryId: number) {
-        return await this.eventRepo.findByCategory(categoryId);
-    }
-
+    
     async listEventsByLocation(locationId: number) {
         return await this.eventRepo.findByLocation(locationId);
     }
 
-    async create(name: string, description: string, date: Date, time: string, categoryId: number, locationId: number) {
+    async create(name: string, description: string, date: Date, time: string, ticketPrice: number, categoryId: number, locationId: number, userId: number) {
         const eventAlreadyExists = await this.eventRepo.findByName(name);
 
         if (eventAlreadyExists) {
@@ -48,17 +44,23 @@ export class EventService {
             description,
             date,
             time,
-            location: { id: locationId } as Event["location"]
+            ticketPrice,
+            location: { id: locationId } as Event["location"],
+            user: { id: userId } as Event["user"]
         });
 
         return event;
     }
 
-    async update(id: number, name: string, description: string, date: Date, time: string, categoryId: number, locationId: number) {
+    async update(id: number, name: string, description: string, date: Date, time: string, ticketPrice: number, categoryId: number, locationId: number, userId?: number) {
         const event = await this.eventRepo.findById(id);
 
         if (!event) {
             throw new Error("Event not found");
+        }
+
+        if (userId && event.user?.id !== userId) {
+            throw new Error("Você só pode editar seus próprios eventos");
         }
 
         const eventAlreadyExists = await this.eventRepo.findByName(name);
@@ -72,17 +74,22 @@ export class EventService {
             description,
             date,
             time,
+            ticketPrice,
             location: { id: locationId } as Event["location"]
         });
 
         return updatedEvent;
     }
 
-    async delete(id: number) {
+    async delete(id: number, userId?: number) {
         const event = await this.eventRepo.findById(id);
 
         if (!event) {
             throw new Error("Event not found");
+        }
+
+        if (userId && event.user?.id !== userId) {
+            throw new Error("Você só pode deletar seus próprios eventos");
         }
 
         await this.eventRepo.delete(id);

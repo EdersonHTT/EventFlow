@@ -7,8 +7,8 @@ import {
 } from "typeorm";
 
 import { Location } from "./Location";
-import { Registration } from "./Registration";
 import { Ticket } from "./Ticket";
+import { User } from "./User";
 
 @Entity("events")
 export class Event {
@@ -28,12 +28,17 @@ export class Event {
     @Column({ type: "time" })
     time: string;
 
-    @ManyToOne(() => Location, location => location.events)
+    @Column("decimal", { precision: 10, scale: 2 })
+    ticketPrice: number;
+
+    @ManyToOne(() => Location, location => location.events, { nullable: false, onDelete: "CASCADE" })
     location: Location;
 
-    @OneToMany(() => Registration, registration => registration.event)
-    registrations: Registration[];
+    @ManyToOne(() => User, user => user.events, { nullable: false, onDelete: "CASCADE" })
+    user: User;
 
-    @OneToMany(() => Ticket, ticket => ticket.event)
+    @OneToMany(() => Ticket, ticket => ticket.event, {
+        cascade: true
+    })
     tickets: Ticket[];
 }

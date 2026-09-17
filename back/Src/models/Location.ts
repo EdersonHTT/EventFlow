@@ -22,6 +22,8 @@ export class Location {
     @Column()
     capacity: number;
 
-    @OneToMany(() => Event, event => event.location)
+    @OneToMany(() => Event, event => event.location, {
+        cascade: true
+    })
     events: Event[];
 }
