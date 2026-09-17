@@ -1,6 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Event } from "./Event";
 
+export enum TicketStatus {
+    pending = "pending",
+    checked = "checked"
+}
+
 @Entity("tickets")
 export class Ticket {
 
@@ -19,9 +24,9 @@ export class Ticket {
     @Column()
     qrCode: string;
 
-    @Column({ default: "pending" })
-    status: string;
+    @Column({ type: "enum", enum: TicketStatus, default: TicketStatus.pending })
+    status: TicketStatus;
 
-    @ManyToOne(() => Event, event => event.tickets)
+    @ManyToOne(() => Event, event => event.tickets, { onDelete: "CASCADE" })
     event: Event;
 }

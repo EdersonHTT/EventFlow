@@ -6,14 +6,14 @@ export class EventRepo {
 
     async findAll() {
         return await this.eventRepository.find({
-            relations: { location: true, registrations: true, tickets: true }
+            relations: { location: true, user: true, tickets: true }
         });
     }
 
     async findById(id: number) {
         return await this.eventRepository.findOne({
             where: { id },
-            relations: { location: true, registrations: true, tickets: true }
+            relations: { location: true, user: true, tickets: true }
         });
     }
 
@@ -26,7 +26,14 @@ export class EventRepo {
     async findByLocation(locationId: number) {
         return await this.eventRepository.find({
             where: { location: { id: locationId } },
-            relations: { location: true, registrations: true, tickets: true }
+            relations: { location: true, user: true, tickets: true }
+        });
+    }
+
+    async findByUser(userId: number) {
+        return await this.eventRepository.find({
+            where: { user: { id: userId } },
+            relations: { location: true, user: true, tickets: true }
         });
     }
 

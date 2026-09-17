@@ -1,11 +1,18 @@
 import { AppDataSource } from "../config/DataSource";
-import { Ticket } from "../models/Ticket";
+import { Ticket, TicketStatus } from "../models/Ticket";
 
 export class TicketRepo {
     private ticketRepository = AppDataSource.getRepository(Ticket);
 
     async findAll() {
         return await this.ticketRepository.find({
+            relations: { event: true }
+        });
+    }
+
+    async findByEventOwner(userId: number) {
+        return await this.ticketRepository.find({
+            where: { event: { user: { id: userId } } },
             relations: { event: true }
         });
     }
@@ -24,7 +31,7 @@ export class TicketRepo {
         });
     }
 
-    async findByStatus(status: string) {
+    async findByStatus(status: TicketStatus) {
         return await this.ticketRepository.find({
             where: { status },
             relations: { event: true }

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Role } from "./role/Role";
-import { Registration } from "./Registration";
+import { Event } from "./Event";
 
 @Entity("users")
 export class User {
@@ -23,8 +23,8 @@ export class User {
     @Column({ length: 11, unique: true })
     Cpf: string;
 
-    @OneToMany(() => Registration, registration => registration.user, {
+    @OneToMany(() => Event, event => event.user, {
         cascade: true
     })
-    registrations: Registration[];
+    events: Event[];
 }

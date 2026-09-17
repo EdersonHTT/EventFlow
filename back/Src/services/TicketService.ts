@@ -1,13 +1,15 @@
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { EventRepo } from "../repositories/EventRepo";
 import { TicketRepo } from "../repositories/TicketRepo";
+import { sendTicketEmail } from "./EmailService";
+import { Ticket, TicketStatus } from "../models/Ticket";
 
 type TicketData = {
     buyerName: string;
     buyerEmail: string;
-    price: number;
+    price?: number;
     qrCode: string;
-    status?: string;
+    status?: TicketStatus;
     eventId: number;
 };
 
@@ -18,12 +20,8 @@ export class TicketService {
     async create(data: TicketData) {
         const { buyerName, buyerEmail, price, qrCode, status, eventId } = data;
 
-        if (!buyerName || !buyerEmail || !qrCode || !eventId || price === undefined || price === null) {
+        if (!buyerEmail || !qrCode || !eventId) {
             throw new BadRequestError("Todos os campos são obrigatórios");
-        }
-
-        if (price <= 0) {
-            throw new BadRequestError("O preço deve ser maior que zero");
         }
 
         const event = await this.eventRepo.findById(eventId);
@@ -32,16 +30,40 @@ export class TicketService {
             throw new NotFoundError("Evento não encontrado");
         }
 
+        if (!event.ticketPrice || event.ticketPrice <= 0) {
+            throw new BadRequestError("O evento não possui um preço de ingresso válido");
+        }
+
         const ticket = await this.ticketRepo.create({
-            buyerName,
+            buyerName: buyerName || buyerEmail.split("@")[0],
             buyerEmail,
-            price,
+            price: event.ticketPrice,
             qrCode,
-            status: status || "pending",
+            status: TicketStatus.pending,
             event
         });
 
+        try {
+            await sendTicketEmail(ticket, event);
+        } catch (error) {
+            console.error("Não foi possível enviar o e-mail do ingresso:", error);
+        }
+
         return ticket;
+    }
+
+    async check(id: number) {
+        const ticket = await this.ticketRepo.findById(Number(id));
+
+        if (!ticket) {
+            throw new NotFoundError("Ticket não encontrado");
+        }
+
+        if (ticket.status === TicketStatus.checked) {
+            throw new ConflictError("Ingresso já verificado");
+        }
+
+        return await this.ticketRepo.update(Number(id), { status: TicketStatus.checked });
     }
 
     async update(id: number, data: Partial<TicketData>) {
@@ -72,8 +94,10 @@ export class TicketService {
         return deletedTicket;
     }
 
-    async listAll() {
-        return await this.ticketRepo.findAll();
+    async listAll(userId?: number) {
+        return userId
+            ? await this.ticketRepo.findByEventOwner(userId)
+            : await this.ticketRepo.findAll();
     }
 
     async listById(id: number) {
@@ -90,7 +114,7 @@ export class TicketService {
         return await this.ticketRepo.findByEvent(Number(eventId));
     }
 
-    async listByStatus(status: string) {
+    async listByStatus(status: TicketStatus) {
         return await this.ticketRepo.findByStatus(status);
     }
 }
