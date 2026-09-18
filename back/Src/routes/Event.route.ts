@@ -3,7 +3,7 @@ import { EventController } from "../controllers/EventController";
 import { authMiddleware } from "../Middleware/authMiddleware";
 import { roleMiddleware } from "../Middleware/roleMiddleware";
 import { Role } from "../models/role/Role";
-import { validateRequest } from "../Middleware/ValidationUser";
+import { validateRequest } from "../Middleware/ValidateRequest";
 import { eventCreateSchema, eventUpdateSchema } from "../validators/EventValidator";
 
 const eventRouter = Router();
